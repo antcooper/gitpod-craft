@@ -1,1 +1,2 @@
-image: craftcms/nginx:7.4-dev
+image:
+  file: .gitpod.Dockerfile
