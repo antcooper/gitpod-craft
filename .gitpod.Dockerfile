@@ -1,1 +1,1 @@
-FROM craftcms/php-nginx:7.4
+FROM craftcms/nginx:8.0
