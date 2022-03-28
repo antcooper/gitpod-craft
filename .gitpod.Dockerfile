@@ -12,3 +12,5 @@ RUN sudo apt remove -y cmake \
     && brew install cmake \
     && brew install php@8.0 \
     && brew install mysql
+
+ENV PATH=/home/linuxbrew/.linuxbrew/opt/php@8.0/bin:/home/linuxbrew/.linuxbrew/opt/php@8.0/sbin:$PATH
