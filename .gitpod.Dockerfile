@@ -1,1 +1,1 @@
-FROM craftcms/nginx:8.0
+FROM craftcms/php-fpm:8.0
