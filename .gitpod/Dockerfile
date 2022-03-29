@@ -5,6 +5,8 @@ USER root
 # Dazzle does not rebuild a layer until one of its lines are changed. Increase this counter to rebuild this layer.
 ENV TRIGGER_REBUILD=1
 
+### MYSQL
+
 # Install MySQL
 RUN install-packages mysql-server \
  && mkdir -p /var/run/mysqld /var/log/mysql \
@@ -19,18 +21,41 @@ COPY .gitpod/client.cnf /etc/mysql/mysql.conf.d/client.cnf
 COPY .gitpod/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
 COPY .gitpod/mysql-bashrc-launch.sh /home/gitpod/.bashrc.d/100-mysql-launch
 
+### NGINX + PHP
+RUN install-packages \
+        apache2 \
+        nginx \
+        nginx-extras \
+        php \
+        php-all-dev \
+        php-bcmath \
+        php-ctype \
+        php-curl \
+        php-date \
+        php-gd \
+        php-intl \
+        php-json \
+        php-mbstring \
+        php-mysql \
+        php-net-ftp \
+        php-pgsql \
+        php-sqlite3 \
+        php-tokenizer \
+        php-xml \
+        php-zip \
+    && curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php \
+    && php /tmp/composer-setup.php  --version=2.2.5 --install-dir=/tmp \
+    && sudo mv /tmp/composer.phar /usr/bin/composer \
+    && rm /tmp/composer-setup.php \
+    && mkdir -p /var/run/nginx \
+    && ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/rewrite.load \
+    && chown -R gitpod:gitpod /etc/apache2 /var/run/apache2 /var/lock/apache2 /var/log/apache2 \
+    && chown -R gitpod:gitpod /etc/nginx /var/run/nginx /var/lib/nginx/ /var/log/nginx/
+COPY --chown=gitpod:gitpod apache2/ /etc/apache2/
+COPY --chown=gitpod:gitpod nginx /etc/nginx/
+
+## The directory relative to your git repository that will be served by Apache / Nginx
+ENV APACHE_DOCROOT_IN_REPO="web"
+ENV NGINX_DOCROOT_IN_REPO="web"
+
 USER gitpod
-
-# Handle PHP install
-RUN mkdir ~/.cache && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-ENV PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin/:$PATH
-ENV MANPATH="$MANPATH:/home/linuxbrew/.linuxbrew/share/man"
-ENV INFOPATH="$INFOPATH:/home/linuxbrew/.linuxbrew/share/info"
-ENV HOMEBREW_NO_AUTO_UPDATE=1
-
-RUN sudo apt remove -y cmake \
-    && brew install cmake \
-    && brew install php@8.0 \
-    && brew install mysql
-
-ENV PATH=/home/linuxbrew/.linuxbrew/opt/php@8.0/bin:/home/linuxbrew/.linuxbrew/opt/php@8.0/sbin:$PATH
