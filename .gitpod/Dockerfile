@@ -17,10 +17,9 @@ COPY .gitpod/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
 COPY .gitpod/client.cnf /etc/mysql/mysql.conf.d/client.cnf
 
 COPY .gitpod/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
+COPY .gitpod/mysql-bashrc-launch.sh /home/gitpod/.bashrc.d/100-mysql-launch
 
 USER gitpod
-
-RUN echo "/etc/mysql/mysql-bashrc-launch.sh" >> /home/gitpod/.bashrc.d/100-mysql-launch
 
 # Handle PHP install
 RUN mkdir ~/.cache && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
